@@ -14,6 +14,14 @@ import OpenSSL
 
 class SecureHTTPServer(HTTPServer):
 
+    def _SSLVerifyCallback(self, conn, cert, errnum, errdepth, ok):
+        print conn
+        print cert
+        print errnum
+        print errdepth
+        print ok
+        return True
+
     def __init__(self, server_address, HandlerClass, server_cert):
         print("self.address_family: %s" % self.address_family)
         self.address_family = socket.AF_INET
@@ -40,8 +48,13 @@ class SecureHTTPServer(HTTPServer):
         ctx.use_certificate(certificate)
         ctx.check_privatekey()
 
+        ctx.set_verify(OpenSSL.SSL.VERIFY_PEER |
+                       OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,
+                       self._SSLVerifyCallback)
+
         self.socket = OpenSSL.SSL.Connection(
            ctx, socket.socket(self.address_family, self.socket_type))
+
         self.server_bind()
         self.server_activate()
 
