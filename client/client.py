@@ -4,6 +4,7 @@
 
 import pycurl
 import sys
+import OpenSSL
 
 def _ConfigRpcCurl(curl, client_cert, ca_info):
 
@@ -12,10 +13,14 @@ def _ConfigRpcCurl(curl, client_cert, ca_info):
   ca_fd.close()
   print ca
 
-  ca_fd = open(client_cert, "r")
-  ca = "".join(ca_fd.readlines())
-  ca_fd.close()
-  print ca
+  cert_fd = open(client_cert, "r")
+  cert_content = cert_fd.read(-1)
+  cert_fd.close()
+
+  certificate = OpenSSL.crypto.load_certificate(
+    OpenSSL.crypto.FILETYPE_PEM, cert_content)
+  key = OpenSSL.crypto.load_privatekey(
+    OpenSSL.crypto.FILETYPE_PEM, cert_content)
 
   curl.setopt(pycurl.FOLLOWLOCATION, False)
   curl.setopt(pycurl.CAINFO, ca_info)
