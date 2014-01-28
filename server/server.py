@@ -7,7 +7,7 @@ import sys
 from SocketServer import BaseServer
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
-from OpenSSL import SSL
+import OpenSSL
 
 # create server.pem with
 # openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes
@@ -20,13 +20,24 @@ class SecureHTTPServer(HTTPServer):
         print("self.socket_type: %s" % self.socket_type)
         self.socket_type = socket.SOCK_STREAM 
         BaseServer.__init__(self, server_address, HandlerClass)
-        ctx = SSL.Context(SSL.SSLv23_METHOD)
+
+        ctx = OpenSSL.SSL.Context(OpenSSL.SSL.SSLv23_METHOD)
+        ctx.set_options(OpenSSL.SSL.OP_NO_SSLv2)
+
         if not server_cert:
           raise Exception("No server cert!")
-        ctx.use_privatekey_file (server_cert)
-        ctx.use_certificate_file(server_cert)
-        self.socket = SSL.Connection(ctx, socket.socket(self.address_family,
-                                                        self.socket_type))
+
+        certificate = OpenSSL.crypto.load_certificate(
+          OpenSSL.crypto.FILETYPE_PEM, server_cert)
+        key = OpenSSL.crypto.load_privatekey(
+          OpenSSL.crypto.FILETYPE_PEM, server_cert)
+
+        ctx.use_privatekey_file(key)
+        ctx.use_certificate_file(certificate)
+        ctx.check_privatekey()
+
+        self.socket = OpenSSL.SSL.Connection(
+           ctx, socket.socket(self.address_family, self.socket_type))
         self.server_bind()
         self.server_activate()
 
