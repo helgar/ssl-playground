@@ -5,11 +5,10 @@
 import pycurl
 import sys
 
-def _ConfigRpcCurl(curl, client_cert):
-  client_cert = str(client_cert)
+def _ConfigRpcCurl(curl, client_cert, ca_info):
 
   curl.setopt(pycurl.FOLLOWLOCATION, False)
-  curl.setopt(pycurl.CAINFO, client_cert)
+  curl.setopt(pycurl.CAINFO, ca_info)
   curl.setopt(pycurl.SSL_VERIFYHOST, 0)
   curl.setopt(pycurl.SSL_VERIFYPEER, True)
   curl.setopt(pycurl.SSLCERTTYPE, "PEM")
@@ -33,20 +32,22 @@ class Response(object):
 
 if __name__ == "__main__":
   print "I am a client!"
-  if len(sys.argv) < 2:
-    print "Not enough arguments. Usage: ./client.py /path/to/client.pem server_address"
+  if len(sys.argv) < 3:
+    print "Not enough arguments. Usage: ./client.py /path/to/client.pem server_address /path/to/cainfo"
   else:
     client_cert = sys.argv[1]
     server_address = sys.argv[2]
-    print "Using server certificate: %s" % client_cert
+    ca_info = sys.argv[3]
+    print "Using client certificate: %s" % client_cert
     print "Contacting server address: %s" % server_address
+    print "Using CA info: %s" % ca_info
 
     res = Response()
     curl = pycurl.Curl()
     curl.setopt(curl.URL, server_address)
     curl.setopt(curl.WRITEFUNCTION, res.callback)
     
-    _ConfigRpcCurl(curl, client_cert)
+    _ConfigRpcCurl(curl, client_cert, ca_info)
 
     curl.perform()
     print res.content()
