@@ -42,6 +42,10 @@ if __name__ == "__main__":
     print "Contacting server address: %s" % server_address
     print "Using CA info: %s" % ca_info
 
+    print("Using PycURL %s", pycurl.version)
+
+    pycurl.global_init(pycurl.GLOBAL_ALL)
+
     res = Response()
     curl = pycurl.Curl()
     curl.setopt(curl.URL, server_address)
@@ -51,4 +55,6 @@ if __name__ == "__main__":
 
     curl.perform()
     print res.content()
+
+    pycurl.global_cleanup()
 
