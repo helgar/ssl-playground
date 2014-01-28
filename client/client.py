@@ -48,3 +48,5 @@ if __name__ == "__main__":
     
     _ConfigRpcCurl(curl, client_cert)
 
+    curl.perform()
+    print res.content()
