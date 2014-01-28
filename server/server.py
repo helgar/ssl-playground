@@ -17,10 +17,11 @@ class SecureHTTPServer(HTTPServer):
     def _SSLVerifyCallback(self, conn, cert, errnum, errdepth, ok):
         print conn
         print cert
+        print cert.get_subject()
         print errnum
         print errdepth
         print ok
-        return True
+        return ok
 
     def __init__(self, server_address, HandlerClass, server_cert):
         print("self.address_family: %s" % self.address_family)
@@ -47,6 +48,13 @@ class SecureHTTPServer(HTTPServer):
         ctx.use_privatekey(key)
         ctx.use_certificate(certificate)
         ctx.check_privatekey()
+
+        try:
+          # This will fail for PyOpenssl versions before 0.10
+          ctx.add_client_ca(certificate)
+        except AttributeError:
+          # Fall back to letting OpenSSL read the certificate file directly.
+          ctx.load_client_ca(server_cert)
 
         ctx.set_verify(OpenSSL.SSL.VERIFY_PEER |
                        OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,
