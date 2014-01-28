@@ -27,13 +27,17 @@ class SecureHTTPServer(HTTPServer):
         if not server_cert:
           raise Exception("No server cert!")
 
-        certificate = OpenSSL.crypto.load_certificate(
-          OpenSSL.crypto.FILETYPE_PEM, server_cert)
-        key = OpenSSL.crypto.load_privatekey(
-          OpenSSL.crypto.FILETYPE_PEM, server_cert)
+        cert_fd = open(server_cert, "r")
+        cert_content = cert_fd.read(-1)
+        cert_fd.close()
 
-        ctx.use_privatekey_file(key)
-        ctx.use_certificate_file(certificate)
+        certificate = OpenSSL.crypto.load_certificate(
+          OpenSSL.crypto.FILETYPE_PEM, cert_content)
+        key = OpenSSL.crypto.load_privatekey(
+          OpenSSL.crypto.FILETYPE_PEM, cert_content)
+
+        ctx.use_privatekey(key)
+        ctx.use_certificate(certificate)
         ctx.check_privatekey()
 
         self.socket = OpenSSL.SSL.Connection(
