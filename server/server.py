@@ -30,6 +30,12 @@ class SecureHTTPServer(HTTPServer):
         self.server_bind()
         self.server_activate()
 
+    def shutdown(self, arg):
+      try:
+        super(BaseServer, self).shutdown(arg)
+      except Exception:
+        super(BaseServer, self).shutdown()
+
 
 class SecureHTTPRequestHandler(SimpleHTTPRequestHandler):
     def setup(self):
