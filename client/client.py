@@ -25,7 +25,7 @@ class Response(object):
     self.chunks = []
   
   def callback(self, chunk):
-    self.chungs.append(chunk)
+    self.chunks.append(chunk)
 
   def content(self):
     return ''.join(self.chunks)
@@ -50,3 +50,4 @@ if __name__ == "__main__":
 
     curl.perform()
     print res.content()
+
