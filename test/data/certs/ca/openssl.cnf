@@ -31,7 +31,7 @@ basicConstraints = CA:false
 [ req ]
 default_bits = 2048
 default_keyfile = /usr/local/google/home/helgav/ganeti-projects/ssl-playground/test/data/certs/ca
-default_md = md5
+default_md = sha1
 
 prompt = no
 distinguished_name = root_ca_distinguished_name
