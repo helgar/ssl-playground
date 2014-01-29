@@ -23,11 +23,10 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
 
   # Create self-signed certificate
   cert = OpenSSL.crypto.X509()
-  if common_name:
-    cert.get_subject().CN = common_name
+  cert.get_subject().CN = "Ganeti"
   cert.set_serial_number(1)
   cert.gmtime_adj_notBefore(0)
-  cert.gmtime_adj_notAfter(validity)
+  cert.gmtime_adj_notAfter(24 * 60 * 60)
   cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
   cert.add_extensions([
@@ -77,7 +76,7 @@ def GenerateSignedX509Cert(common_name, signer_key, validity, certfile, keyfile)
   cert.get_subject().CN = "I am a node!"
   cert.set_serial_number(1)
   cert.gmtime_adj_notBefore(0)
-  cert.gmtime_adj_notAfter(validity)
+  cert.gmtime_adj_notAfter(24 * 60 * 60)
   cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
   cert.sign(signer_key, X509_CERT_SIGN_DIGEST)
@@ -162,5 +161,5 @@ if __name__ == "__main__":
     clientkey = sys.argv[4]
     clientreq = sys.argv[5]
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
-    (cakeypem, cacertpem) = GenerateSelfSignedX509Cert("blablubb", 356, cacert, cakey)
+    (cakeypem, cacertpem) = GenerateSelfSignedX509Cert("Ganeti", 356, cacert, cakey)
     GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
