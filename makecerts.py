@@ -29,7 +29,7 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   cert.gmtime_adj_notAfter(24 * 60 * 60)
   cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
-  cert.set_version(3)
+  cert.set_version(0x02)
   cert.add_extensions([
     OpenSSL.crypto.X509Extension("basicConstraints", True,
                                  "CA:TRUE, pathlen:0"),
@@ -140,7 +140,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   cert.gmtime_adj_notAfter(24 * 60 * 60)
   cert.set_issuer(ca_cert.get_subject())
   cert.set_pubkey(req.get_pubkey())
-  cert.set_version(3)
+  cert.set_version(0x02)
   cert.sign(ca_key, "sha1")
 
   cert_pem = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
