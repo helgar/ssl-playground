@@ -15,12 +15,12 @@ import OpenSSL
 class SecureHTTPServer(HTTPServer):
 
     def _SSLVerifyCallback(self, conn, cert, errnum, errdepth, ok):
-        print conn
-        print cert
-        print cert.get_subject()
-        print errnum
-        print errdepth
-        print ok
+        print "conn: %s" % conn
+        print "cert: %s" % cert
+        print "cert.subject: %s" % cert.get_subject()
+        print "errnum: %s" % errnum
+        print "errdepth: %s" % errdepth
+        print "ok: %s" % ok
         return True
 
     def __init__(self, server_address, HandlerClass, server_cert, ca_cert, server_key):
@@ -71,6 +71,11 @@ class SecureHTTPServer(HTTPServer):
         except AttributeError:
           # Fall back to letting OpenSSL read the certificate file directly.
           ctx.load_client_ca(ca_cert)
+
+        print "Using server certificate: %s" % server_cert
+        print "Using server address: %s" % server_name
+        print "Using ca certificate: %s" % ca_cert
+        print "Using server private key: %s" % server_key
 
         ctx.set_verify(OpenSSL.SSL.VERIFY_PEER | 
                        OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,

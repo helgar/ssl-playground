@@ -8,6 +8,7 @@ import OpenSSL
 
 def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
 
+  # reading CA info
   ca_fd = open(ca_info, "r")
   ca = "".join(ca_fd.readlines())
   ca_fd.close()
@@ -32,12 +33,13 @@ def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
   curl.setopt(pycurl.FOLLOWLOCATION, False)
   curl.setopt(pycurl.CAINFO, ca_info)
   curl.setopt(pycurl.SSL_VERIFYHOST, 0)
-  curl.setopt(pycurl.SSL_VERIFYPEER, 1)
+  curl.setopt(pycurl.SSL_VERIFYPEER, True)
   curl.setopt(pycurl.SSLCERTTYPE, "PEM")
   curl.setopt(pycurl.SSLCERT, client_cert)
   curl.setopt(pycurl.SSLKEYTYPE, "PEM")
   curl.setopt(pycurl.SSLKEY, client_key)
   curl.setopt(pycurl.CONNECTTIMEOUT, 360)
+  curl.setopt(pycurl.VERBOSE, 1)
 
 
 class Response(object):
