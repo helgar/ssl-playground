@@ -26,7 +26,7 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   cert.get_subject().CN = "Ganeti"
   cert.set_serial_number(1)
   cert.gmtime_adj_notBefore(0)
-  cert.gmtime_adj_notAfter(24 * 60 * 60)
+  cert.gmtime_adj_notAfter(24 * 60 * 60 * 365)
   cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
   cert.set_version(0x02)
@@ -77,7 +77,7 @@ def GenerateSignedX509Cert(common_name, signer_key, validity, certfile, keyfile)
   cert.get_subject().CN = "I am a node!"
   cert.set_serial_number(1)
   cert.gmtime_adj_notBefore(0)
-  cert.gmtime_adj_notAfter(24 * 60 * 60)
+  cert.gmtime_adj_notAfter(24 * 60 * 60 * 365)
   cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
   cert.sign(signer_key, X509_CERT_SIGN_DIGEST)
@@ -99,7 +99,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
   # Create private and public key
   key = OpenSSL.crypto.PKey()
-  key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
+  key.generate_key(OpenSSL.crypto.TYPE_RSA, 1024)
   
   req = OpenSSL.crypto.X509Req()
   req.get_subject().CN = "node1.example.com"
@@ -137,7 +137,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   cert.set_subject(req.get_subject())
   cert.set_serial_number(1)
   cert.gmtime_adj_notBefore(0)
-  cert.gmtime_adj_notAfter(24 * 60 * 60)
+  cert.gmtime_adj_notAfter(24 * 60 * 60 * 365)
   cert.set_issuer(ca_cert.get_subject())
   cert.set_pubkey(req.get_pubkey())
   cert.set_version(0x02)
