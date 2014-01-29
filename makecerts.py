@@ -30,6 +30,15 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   cert.gmtime_adj_notAfter(validity)
   cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
+  cert.add_extensions([
+    OpenSSL.crypto.X509Extension("basicConstraints", True,
+                                 "CA:TRUE, pathlen:0"),
+    OpenSSL.crypto.X509Extension("keyUsage", True,
+                                 "keyCertSign, cRLSign"),
+    OpenSSL.crypto.X509Extension("subjectKeyIdentifier", False, "hash",
+                                 subject=cert),
+    ])
+
   cert.sign(key, X509_CERT_SIGN_DIGEST)
 
   key_pem = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
