@@ -34,7 +34,7 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
     OpenSSL.crypto.X509Extension("basicConstraints", True,
                                  "CA:TRUE, pathlen:0"),
     OpenSSL.crypto.X509Extension("keyUsage", True,
-                                 "keyCertSign, cRLSign, sslClient, sslServer"),
+                                 "keyCertSign, cRLSign, digitalSignature, keyEncipherment"),
     OpenSSL.crypto.X509Extension("subjectKeyIdentifier", False, "hash",
                                  subject=cert),
     ])
