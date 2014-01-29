@@ -56,8 +56,8 @@ class SecureHTTPServer(HTTPServer):
           # Fall back to letting OpenSSL read the certificate file directly.
           ctx.load_client_ca(server_cert)
 
-        ctx.set_verify(OpenSSL.SSL.VERIFY_PEER |
-                       OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,
+        ctx.set_verify(OpenSSL.SSL.VERIFY_PEER, 
+#                      OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,
                        self._SSLVerifyCallback)
 
         self.socket = OpenSSL.SSL.Connection(
