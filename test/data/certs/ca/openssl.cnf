@@ -27,3 +27,26 @@ organizationalUnitName = optional
 [ certificate_extensions ]
 basicConstraints = CA:false
 
+
+[ req ]
+default_bits = 2048
+default_keyfile = /usr/local/google/home/helgav/ganeti-projects/ssl-playground/test/data/certs/ca/private/cakey.pem
+default_md = md5
+
+prompt = no
+distinguished_name = root_ca_distinguished_name
+
+x509_extensions = root_ca_extensions
+
+[ root_ca_distinguished_name ]
+
+commonName = Example CA
+stateOrProvinceName = Virginia
+countryName = US
+emailAddress = ca@exampleca.org
+organizationName = Root Certification Authority
+
+[ root_ca_extensions ]
+basicConstraints = CA:true
+
+
