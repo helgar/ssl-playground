@@ -1,1 +1,2 @@
-V	150129124924Z		01	unknown	/CN=blablabla/ST=balksdjf/C=DE/emailAddress=helgav@google.com/O=alsdkjf/OU=laskdfj
+V	150129125854Z		01	unknown	/CN=localhost/ST=Germany/C=DE/emailAddress=helgav@google.com/O=Server/OU=Server
+V	150129125900Z		02	unknown	/CN=localhost/ST=Germany/C=DE/emailAddress=helgav@google.com/O=Client/OU=Client
