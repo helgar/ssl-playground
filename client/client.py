@@ -33,7 +33,7 @@ def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
   curl.setopt(pycurl.FOLLOWLOCATION, False)
   curl.setopt(pycurl.CAINFO, ca_info)
   curl.setopt(pycurl.SSL_VERIFYHOST, 0)
-  curl.setopt(pycurl.SSL_VERIFYPEER, True)
+  curl.setopt(pycurl.SSL_VERIFYPEER, 1)
   curl.setopt(pycurl.SSLCERTTYPE, "PEM")
   curl.setopt(pycurl.SSLCERT, client_cert)
   curl.setopt(pycurl.SSLKEYTYPE, "PEM")
