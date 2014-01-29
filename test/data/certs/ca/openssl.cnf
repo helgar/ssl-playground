@@ -17,7 +17,7 @@ policy = exampleca_policy
 x509_extensions = certificate_extensions
 
 [ exampleca_policy ]
-commonName = suplied
+commonName = supplied
 stateOrProvinceName = supplied
 countryName = supplied
 emailAddress = supplied
@@ -39,7 +39,6 @@ distinguished_name = root_ca_distinguished_name
 x509_extensions = root_ca_extensions
 
 [ root_ca_distinguished_name ]
-
 commonName = Example CA
 stateOrProvinceName = Virginia
 countryName = US
