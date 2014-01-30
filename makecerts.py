@@ -160,7 +160,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
     OpenSSL.crypto.X509Extension("subjectKeyIdentifier", False, "hash",
                                  subject=cert),
     ])
-  cert.sign(ca_key, "sha1")
+  cert.sign(ca_key, X509_CERT_SIGN_DIGEST)
 
   cert_pem = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
 
