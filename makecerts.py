@@ -6,18 +6,17 @@ import sys
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
 
-def GetIssuer():
+def SetSubject(subject):
   """
   Our default CA issuer name.
   """
-  issuer = OpenSSL.X509Name()
-  issuer.C = "DE"
-  issuer.CN = "localhost"
-  issuer.ST = 'DE'
-  issuer.L = 'Munich'
-  issuer.O = 'Ganeti'
-  issuer.OU = 'Ganeti Testing'
-  return issuer
+  subject.C = "DE"
+  subject.CN = "localhost"
+  subject.ST = 'DE'
+  subject.L = 'Munich'
+  subject.O = 'Ganeti'
+  subject.OU = 'Ganeti Testing'
+  subject.emailAddress = 'ganeti@ganeti.org'
 
 def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   """Generates a self-signed X509 certificate.
@@ -36,11 +35,11 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
 
   # Create self-signed certificate
   cert = OpenSSL.crypto.X509()
-  cert.set_subject(GetIssuer())
+  SetSubject(cert.get_subject())
   cert.set_serial_number(1)
   cert.gmtime_adj_notBefore(0)
   cert.gmtime_adj_notAfter(24 * 60 * 60 * 365)
-  cert.set_issuer(GetIssuer())
+  cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
   cert.set_version(0x02)
   cert.add_extensions([
@@ -87,11 +86,11 @@ def GenerateSignedX509Cert(common_name, signer_key, validity, certfile, keyfile)
 
   # Create self-signed certificate
   cert = OpenSSL.crypto.X509()
-  cert.set_subject(GetIssuer())
+  SetSubject(cert.get_subject())
   cert.set_serial_number(1)
   cert.gmtime_adj_notBefore(0)
   cert.gmtime_adj_notAfter(24 * 60 * 60 * 365)
-  cert.set_issuer(GetIssuer())
+  cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
   cert.sign(signer_key, X509_CERT_SIGN_DIGEST)
 
@@ -115,7 +114,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   key.generate_key(OpenSSL.crypto.TYPE_RSA, 1024)
   
   req = OpenSSL.crypto.X509Req()
-  req.get_subject().CN = "localhost"
+  SetSubject(req.get_subject())
   req.set_pubkey(key)
   req.sign(key, "sha1")
 
