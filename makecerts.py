@@ -160,6 +160,14 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   cert.set_issuer(ca_cert.get_subject())
   cert.set_pubkey(req.get_pubkey())
   cert.set_version(0x02)
+  cert.add_extensions([
+    OpenSSL.crypto.X509Extension("basicConstraints", True,
+                                 "CA:TRUE, pathlen:0"),
+    OpenSSL.crypto.X509Extension("keyUsage", True,
+                                 "keyCertSign, cRLSign, digitalSignature, keyEncipherment"),
+    OpenSSL.crypto.X509Extension("subjectKeyIdentifier", False, "hash",
+                                 subject=cert),
+    ])
   cert.sign(ca_key, "sha1")
 
   cert_pem = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
