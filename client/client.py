@@ -40,6 +40,7 @@ def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
   curl.setopt(pycurl.SSLKEY, client_key)
   curl.setopt(pycurl.CONNECTTIMEOUT, 360)
   curl.setopt(pycurl.VERBOSE, 1)
+  curl.setopt(pycurl.SSLVERSION, pycurl.SSLVERSION_SSLv3)
 
 
 class Response(object):
