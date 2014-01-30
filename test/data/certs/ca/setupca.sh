@@ -42,12 +42,12 @@ OPENSSL_CONF=${CONFIG_FILE} openssl req -x509 -newkey rsa:2048 -out ${CA_CERT} -
 OPENSSL_CONF=${CONFIG_FILE} openssl x509 -in ${CA_CERT} -text -noout
 
 # create a certificate request:
-unset OPENSSL_CONF && openssl req -newkey rsa:1024 -keyout ${SERVER_KEY} -keyform PEM -out ${SERVER_REQ} -nodes
-unset OPENSSL_CONF && openssl req -newkey rsa:1024 -keyout ${CLIENT_KEY} -keyform PEM -out ${CLIENT_REQ} -nodes
+unset OPENSSL_CONF && openssl req -newkey rsa:2048 -keyout ${SERVER_KEY} -keyform PEM -out ${SERVER_REQ} -nodes
+unset OPENSSL_CONF && openssl req -newkey rsa:2048 -keyout ${CLIENT_KEY} -keyform PEM -out ${CLIENT_REQ} -nodes
 # check that it worked
 openssl req -in ${SERVER_REQ} -text -noout
 
 # signing the certificate request with the CA
-OPENSSL_CONF=${CONFIG_FILE} openssl ca -in ${SERVER_REQ} -out ${SERVER_CERT}
-OPENSSL_CONF=${CONFIG_FILE} openssl ca -in ${CLIENT_REQ} -out ${CLIENT_CERT}
+OPENSSL_CONF=${CONFIG_FILE} openssl ca -in ${SERVER_REQ} -out ${SERVER_CERT} -md sha1
+OPENSSL_CONF=${CONFIG_FILE} openssl ca -in ${CLIENT_REQ} -out ${CLIENT_CERT} -md sha1
 # consider using the -out and -notext option

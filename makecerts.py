@@ -4,7 +4,7 @@ import OpenSSL
 import sys
 
 X509_CERT_SIGN_DIGEST = "SHA1"
-RSA_KEY_BITS = 2048
+RSA_KEY_BITS = 1024
 
 def SetSubject(subject):
   """
@@ -111,12 +111,12 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
   # Create private and public key
   key = OpenSSL.crypto.PKey()
-  key.generate_key(OpenSSL.crypto.TYPE_RSA, 1024)
+  key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
   
   req = OpenSSL.crypto.X509Req()
   SetSubject(req.get_subject())
   req.set_pubkey(key)
-  req.sign(key, "sha1")
+  req.sign(key, X509_CERT_SIGN_DIGEST)
 
   # Write private key
   key_pem = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
