@@ -153,12 +153,8 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   cert.set_pubkey(req.get_pubkey())
   cert.set_version(0x02)
   cert.add_extensions([
-    OpenSSL.crypto.X509Extension("basicConstraints", True,
-                                 "CA:TRUE, pathlen:0"),
-    OpenSSL.crypto.X509Extension("keyUsage", True,
-                                 "keyCertSign, cRLSign, digitalSignature, keyEncipherment"),
-    OpenSSL.crypto.X509Extension("subjectKeyIdentifier", False, "hash",
-                                 subject=cert),
+    OpenSSL.crypto.X509Extension("basicConstraints", False,
+                                 "CA:FALSE"),
     ])
   cert.sign(ca_key, X509_CERT_SIGN_DIGEST)
 
