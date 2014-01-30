@@ -4,7 +4,7 @@ import OpenSSL
 import sys
 
 X509_CERT_SIGN_DIGEST = "SHA1"
-RSA_KEY_BITS = 1024
+RSA_KEY_BITS = 2048
 
 def SetSubject(subject):
   """
