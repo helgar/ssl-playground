@@ -164,6 +164,17 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   cfd.write(cert_pem)
   cfd.close()
 
+  ctx = OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_METHOD)
+  ctx.use_privatekey(key)
+  ctx.use_certificate(cert)
+  try:
+    ctx.check_privatekey()
+  except OpenSSL.SSL.Error:
+    print "Incorrect key"
+  else:
+    print "Key matches certificate"
+
+
   return (key_pem, cert_pem)
 
 
