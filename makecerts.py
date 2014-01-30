@@ -2,7 +2,6 @@
 
 import OpenSSL
 import sys
-import X509
 
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
@@ -11,7 +10,7 @@ def GetIssuer():
   """
   Our default CA issuer name.
   """
-  issuer = X509.X509_Name()
+  issuer = OpenSSL.X509Name()
   issuer.C = "DE"
   issuer.CN = "localhost"
   issuer.ST = 'DE'
