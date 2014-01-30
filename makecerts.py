@@ -143,8 +143,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
   ca_cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cacert_content)
   ca_key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, cakey_content)
-  req = OpenSSL.crypto.load_certificate_request(OpenSSL.crypto.FILETYPE_PEM,
-                                                req_pem)
+
   cert = OpenSSL.crypto.X509()
   cert.set_subject(req.get_subject())
   cert.set_serial_number(1)
