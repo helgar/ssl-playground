@@ -8,8 +8,11 @@ import subprocess
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
 
-CA_CERT_FILE="ca_cert.pem"
-CA_KEY_FILE="ca_key"
+CA_CERT_FILE="ca_cert_py.pem"
+CA_KEY_FILE="ca_key_py.pem"
+
+CA_CERT_CMD_FILE="ca_cert.pem"
+CA_KEY_CMD_FILE="ca_key.pem"
 
 CLIENT_CERT_FILE="client_cert.pem"
 CLIENT_KEY_FILE="client_key.pem"
@@ -25,13 +28,11 @@ def SetSubject(subject):
   """
   Our default CA issuer name.
   """
-  subject.C = "DE"
-  subject.CN = "localhost"
-  subject.ST = 'DE'
-  subject.L = 'Munich'
-  subject.O = 'Ganeti'
-  subject.OU = 'Ganeti Testing'
-  subject.emailAddress = 'ganeti@ganeti.org'
+  subject.CN = "Example CA"
+  subject.ST = 'Viriginia'
+  subject.C = "US"
+  subject.emailAddress = 'ca@exampleca.org'
+  subject.O = 'Root Certification Authority'
 
 def RunCmd(cmd, env=None):
   if not isinstance(cmd, basestring):
@@ -138,12 +139,8 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   cert.set_pubkey(key)
   cert.set_version(0x02)
   cert.add_extensions([
-    OpenSSL.crypto.X509Extension("basicConstraints", True,
-                                 "CA:TRUE, pathlen:0"),
-    OpenSSL.crypto.X509Extension("keyUsage", True,
-                                 "keyCertSign, cRLSign, digitalSignature, keyEncipherment"),
-    OpenSSL.crypto.X509Extension("subjectKeyIdentifier", False, "hash",
-                                 subject=cert),
+    OpenSSL.crypto.X509Extension("basicConstraints", False,
+                                 "CA:TRUE"),
     ])
 
   cert.sign(key, X509_CERT_SIGN_DIGEST)
@@ -215,7 +212,8 @@ if __name__ == "__main__":
     clientreq = sys.argv[5]
     openssl_cnf = sys.argv[6]
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
-    (cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
-    #GenerateCaCert(openssl_cnf, cacert, cakey)
-    VerifyKeyCertFile(cakey, cacert)
-    GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
+    (cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, CA_CERT_FILE, CA_KEY_FILE)
+    VerifyKeyCertFile(CA_KEY_FILE, CA_CERT_FILE)
+    GenerateCaCert(openssl_cnf, CA_CERT_CMD_FILE, CA_KEY_CMD_FILE)
+    VerifyKeyCertFile(CA_KEY_CMD_FILE, CA_CERT_CMD_FILE)
+    GenerateKeyAndRequest(CA_CERT_FILE, CA_KEY_FILE, CLIENT_CERT_FILE, CLIENT_KEY_FILE, CLIENT_REQ_FILE)
