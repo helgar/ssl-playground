@@ -64,7 +64,6 @@ def GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file):
           'openssl', 'req', '-x509', '-newkey rsa:2048',
           '-out %s' % ca_cert_file,
           '-outform PEM',
-          '-key %s' % ca_key_file,
           '-nodes']  
 
 def GenerateCaCert(openssl_cnf_file, ca_cert_file, ca_key_file):
@@ -210,5 +209,5 @@ if __name__ == "__main__":
     openssl_cnf = sys.argv[6]
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
     #(cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
-    GenerateCaCert(openssl_cnf, "cmd_%s" % cacert, "cmd_%s" % cakey)
+    GenerateCaCert(openssl_cnf, cacert, cakey)
     GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
