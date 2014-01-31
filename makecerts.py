@@ -27,6 +27,71 @@ def RunCmd(cmd):
   out, err = p.communicate()
   print("RunCmd: OUT: %s\n ERR:%s\n" % (out, err)) 
 
+## create root cert:
+#OPENSSL_CONF=${CONFIG_FILE} openssl req -x509 -newkey rsa:2048 -out ${CA_CERT} -outform PEM -key ${PRIVATE_DIR}/${CA_KEY} -nodes
+#
+## check what it looks like:
+#OPENSSL_CONF=${CONFIG_FILE} openssl x509 -in ${CA_CERT} -text -noout
+#
+## create a certificate request:
+#unset OPENSSL_CONF && openssl req -newkey rsa:2048 -keyout ${SERVER_KEY} -keyform PEM -out ${SERVER_REQ} -nodes
+#unset OPENSSL_CONF && openssl req -newkey rsa:2048 -keyout ${CLIENT_KEY} -keyform PEM -out ${CLIENT_REQ} -nodes
+## check that it worked
+#openssl req -in ${SERVER_REQ} -text -noout
+#
+## signing the certificate request with the CA
+#OPENSSL_CONF=${CONFIG_FILE} openssl ca -in ${SERVER_REQ} -out ${SERVER_CERT} -md sha1
+#OPENSSL_CONF=${CONFIG_FILE} openssl ca -in ${CLIENT_REQ} -out ${CLIENT_CERT} -md sha1
+## consider using the -out and -notext option
+
+def GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file):
+  return ['OPENSSL_CONF=%s' % openssl_cnf_file,
+          'openssl', 'req', '-x509', '-newkey rsa:2048',
+          '-out %s' % ca_cert_file,
+          '-outform PEM',
+          '-key %s' % ca_key_file,
+          '-nodes']  
+
+def GenerateCaCert(openssl_cnf_file, ca_cert_file, ca_key_file):
+  RunCmd(GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file))
+
+def WritePemFile(pem_str, pem_file):
+  pfd = open(pem_file, 'w')
+  pfd.write(pem_str)
+  pfd.close()
+
+def WriteCertificate(cert, pem_file):
+  pem_str = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
+  WritePemFile(pem_str, pem_file)
+
+def WriteKey(key, pem_file):
+  pem_str = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
+  WritePemFile(pem_str, pem_file)
+
+def WriteRequest(req, pem_file):
+  pem_str = OpenSSL.crypto.dump_certificate_request(OpenSSL.crypto.FILETYPE_PEM, req)
+  WritePemFile(pem_str, pem_file)
+
+def ReadPemFile(pem_file):
+  pem_fd = open(pem_file, "r")
+  pem_str = pem_fd.read(-1)
+  pem_fd.close()
+  return pem_str
+
+def ReadCertificate(pem_file):
+  pem_str = ReadPemFile(pem_file)
+  cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, pem_str)
+  return cert
+
+def ReadKey(pem_file):
+  pem_str = ReadPemFile(pem_file)
+  key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, pem_str)
+  return key
+
+def ReadRequest(pem_file):
+  pem_str = ReadPemFile(pem_file)
+  key = OpenSSL.crypto.load_certificate_request(OpenSSL.crypto.FILETYPE_PEM, pem_str)
+  return key
 
 def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   """Generates a self-signed X509 certificate.
@@ -63,19 +128,21 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
 
   cert.sign(key, X509_CERT_SIGN_DIGEST)
 
-  key_pem = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
-  cert_pem = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
-
-  cfd = open(certfile, 'w')
-  cfd.write(cert_pem)
-  cfd.close()
-
-  kfd = open(keyfile, 'w')
-  kfd.write(key_pem)
-  kfd.close()
+  WriteKey(key, keyfile)
+  WriteCertificate(cert, certfile)
 
   return (key, cert)
 
+def VerifyKeyCert(key, cert):
+  ctx = OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_METHOD)
+  ctx.use_privatekey(key)
+  ctx.use_certificate(cert)
+  try:
+    ctx.check_privatekey()
+  except OpenSSL.SSL.Error:
+    print "Incorrect key"
+  else:
+    print "Key matches certificate"
 
 def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
@@ -88,31 +155,11 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   req.set_pubkey(key)
   req.sign(key, X509_CERT_SIGN_DIGEST)
 
-  # Write private key
-  key_pem = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
+  WriteKey(key, keyfile)
+  WriteRequest(req, reqfile)
 
-  # Write request
-  req_pem = OpenSSL.crypto.dump_certificate_request(OpenSSL.crypto.FILETYPE_PEM, req)
-
-  cfd = open(reqfile, 'w')
-  cfd.write(req_pem)
-  cfd.close()
-
-  kfd = open(keyfile, 'w')
-  kfd.write(key_pem)
-  kfd.close()
-
-  # load ca certificates
-  cacert_fd = open(cacertfile, "r")
-  cacert_content = cacert_fd.read(-1)
-  cacert_fd.close()
-
-  cakey_fd = open(cakeyfile, "r")
-  cakey_content = cakey_fd.read(-1)
-  cakey_fd.close()
-
-  ca_cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cacert_content)
-  ca_key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, cakey_content)
+  ca_cert = ReadCertificate(cacertfile)
+  ca_key = ReadKey(cakeyfile)
 
   cert = OpenSSL.crypto.X509()
   cert.set_subject(req.get_subject())
@@ -128,25 +175,8 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
     ])
   cert.sign(ca_key, X509_CERT_SIGN_DIGEST)
 
-  cert_pem = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
-
-  cfd = open(certfile, 'w')
-  cfd.write(cert_pem)
-  cfd.close()
-
-  ctx = OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_METHOD)
-  ctx.use_privatekey(key)
-  ctx.use_certificate(cert)
-  try:
-    ctx.check_privatekey()
-  except OpenSSL.SSL.Error:
-    print "Incorrect key"
-  else:
-    print "Key matches certificate"
-
-
-  return (key_pem, cert_pem)
-
+  WriteCertificate(cert, certfile)
+  VerifyKeyCert(key, cert)
 
 
 if __name__ == "__main__":
