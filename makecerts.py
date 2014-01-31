@@ -36,9 +36,11 @@ def SetSubject(subject):
 def RunCmd(cmd, env=None):
   if not isinstance(cmd, basestring):
     cmd = [str(val) for val in cmd] 
+  #cmd = ["openssl version -a"]
   print("Running command: %s" % ' '.join(cmd))
+  cmd_str = ' '.join(cmd)
 
-  p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+  p = subprocess.Popen(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   out, err = p.communicate()
   print("RunCmd: OUT: %s\n ERR:%s\n" % (out, err)) 
 
@@ -210,4 +212,4 @@ if __name__ == "__main__":
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
     #(cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
     GenerateCaCert(openssl_cnf, cacert, cakey)
-    #GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
+    GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
