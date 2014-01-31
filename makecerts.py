@@ -215,7 +215,7 @@ if __name__ == "__main__":
     clientreq = sys.argv[5]
     openssl_cnf = sys.argv[6]
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
-    #(cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
-    GenerateCaCert(openssl_cnf, cacert, cakey)
+    (cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
+    #GenerateCaCert(openssl_cnf, cacert, cakey)
     VerifyKeyCertFile(cakey, cacert)
     GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
