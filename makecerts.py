@@ -1,11 +1,25 @@
 #/usr/bin/python
 
 import OpenSSL
+import os
 import sys
 import subprocess
 
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
+
+CA_CERT_FILE="ca_cert.pem"
+CA_KEY_FILE="ca_key"
+
+CLIENT_CERT_FILE="client_cert.pem"
+CLIENT_KEY_FILE="client_key.pem"
+CLIENT_REQ_FILE="client_req.pem"
+
+SERVER_CERT_FILE="server_cert.pem"
+SERVER_KEY_FILE="server_key.pem"
+SERVER_REQ_FILE="server_req.pem"
+
+OPENSSL_CNF_FILE="openssl.cnf"
 
 def SetSubject(subject):
   """
@@ -19,11 +33,12 @@ def SetSubject(subject):
   subject.OU = 'Ganeti Testing'
   subject.emailAddress = 'ganeti@ganeti.org'
 
-def RunCmd(cmd):
+def RunCmd(cmd, env=None):
   if not isinstance(cmd, basestring):
     cmd = [str(val) for val in cmd] 
+  print("Running command: %s" % cmd)
 
-  p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
   out, err = p.communicate()
   print("RunCmd: OUT: %s\n ERR:%s\n" % (out, err)) 
 
@@ -45,7 +60,7 @@ def RunCmd(cmd):
 ## consider using the -out and -notext option
 
 def GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file):
-  return ['OPENSSL_CONF=%s' % openssl_cnf_file,
+  return ["OPENSSL_CONF=%s" % openssl_cnf_file,
           'openssl', 'req', '-x509', '-newkey rsa:2048',
           '-out %s' % ca_cert_file,
           '-outform PEM',
@@ -53,7 +68,11 @@ def GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file):
           '-nodes']  
 
 def GenerateCaCert(openssl_cnf_file, ca_cert_file, ca_key_file):
-  RunCmd(GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file))
+  cmd = GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file)
+  my_env = os.environ
+  my_env["OPENSSL_CONF"] = openssl_cnf_file
+  #cmd = "echo $OPENSSL_CONF"
+  RunCmd(cmd, env=my_env)
 
 def WritePemFile(pem_str, pem_file):
   pfd = open(pem_file, 'w')
@@ -130,6 +149,7 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
 
   WriteKey(key, keyfile)
   WriteCertificate(cert, certfile)
+  VerifyKeyCert(key, cert)
 
   return (key, cert)
 
@@ -178,16 +198,17 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   WriteCertificate(cert, certfile)
   VerifyKeyCert(key, cert)
 
-
 if __name__ == "__main__":
-  if len(sys.argv) < 5:
-    print "Not enough arguments. Usage: ./makecerts.py cacert cakey clientcert clientkey clientreq"
+  if len(sys.argv) < 6:
+    print "Not enough arguments. Usage: ./makecerts.py cacert cakey clientcert clientkey clientreq openssl"
   else:
     cacert = sys.argv[1]
     cakey = sys.argv[2]
     clientcert = sys.argv[3]
     clientkey = sys.argv[4]
     clientreq = sys.argv[5]
+    openssl_cnf = sys.argv[6]
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
-    (cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
+    #(cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
+    GenerateCaCert(openssl_cnf, "cmd_%s" % cacert, "cmd_%s" % cakey)
     GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
