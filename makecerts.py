@@ -165,6 +165,11 @@ def VerifyKeyCert(key, cert):
   else:
     print "Key matches certificate"
 
+def VerifyKeyCertFile(key_file, cert_file):
+  key = ReadKey(key_file)
+  cert = ReadCertificate(cert_file)
+  VerifyKeyCert(key, cert)
+
 def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
   # Create private and public key
@@ -212,4 +217,5 @@ if __name__ == "__main__":
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
     #(cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
     GenerateCaCert(openssl_cnf, cacert, cakey)
+    VerifyKeyCertFile(cakey, cacert)
     GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
