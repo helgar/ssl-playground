@@ -35,6 +35,16 @@ def SetSubject(subject):
   subject.emailAddress = 'ca@exampleca.org'
   subject.O = 'Root Certification Authority'
 
+def SetServerSubject(subject):
+  """
+  Our default CA issuer name.
+  """
+  subject.CN = "localhost"
+  subject.ST = 'Viriginia'
+  subject.C = "US"
+  subject.emailAddress = 'ca@exampleca.org'
+  subject.O = 'Root Certification Authority'
+
 def RunCmd(cmd, env=None):
   if not isinstance(cmd, basestring):
     cmd = [str(val) for val in cmd] 
@@ -175,7 +185,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
   
   req = OpenSSL.crypto.X509Req()
-  SetSubject(req.get_subject())
+  SetServerSubject(req.get_subject())
   req.set_pubkey(key)
   req.sign(key, X509_CERT_SIGN_DIGEST)
 
