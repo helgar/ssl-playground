@@ -36,7 +36,7 @@ def SetSubject(subject):
 def RunCmd(cmd, env=None):
   if not isinstance(cmd, basestring):
     cmd = [str(val) for val in cmd] 
-  print("Running command: %s" % cmd)
+  print("Running command: %s" % ' '.join(cmd))
 
   p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
   out, err = p.communicate()
