@@ -226,6 +226,8 @@ if __name__ == "__main__":
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
     (cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, CA_CERT_FILE, CA_KEY_FILE)
     VerifyKeyCertFile(CA_KEY_FILE, CA_CERT_FILE)
+    (cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, "other_ca_cert.pem", "other_ca_key.pem")
+    VerifyKeyCertFile("other_ca_key.pem", "other_ca_cert.pem")
     #GenerateCaCert(openssl_cnf, CA_CERT_CMD_FILE, CA_KEY_CMD_FILE)
     #VerifyKeyCertFile(CA_KEY_CMD_FILE, CA_CERT_CMD_FILE)
     GenerateKeyAndRequest(CA_CERT_FILE, CA_KEY_FILE, CLIENT_CERT_FILE, CLIENT_KEY_FILE, CLIENT_REQ_FILE)
