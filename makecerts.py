@@ -2,6 +2,7 @@
 
 import OpenSSL
 import sys
+import subprocess
 
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
@@ -17,6 +18,15 @@ def SetSubject(subject):
   subject.O = 'Ganeti'
   subject.OU = 'Ganeti Testing'
   subject.emailAddress = 'ganeti@ganeti.org'
+
+def RunCmd(cmd):
+  if not isinstance(cmd, basestring):
+    cmd = [str(val) for val in cmd] 
+
+  p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  out, err = p.communicate()
+  print("RunCmd: OUT: %s\n ERR:%s\n" % (out, err)) 
+
 
 def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   """Generates a self-signed X509 certificate.
@@ -66,46 +76,6 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
 
   return (key, cert)
 
-
-def GenerateSignedX509Cert(common_name, signer_key, validity, certfile, keyfile):
-  """Generates a self-signed X509 certificate.
-
-  @type common_name: string
-  @param common_name: commonName value
-  @type signer_key: string
-  @param signer_key: key of the entity to sign the cert
-  @type validity: int
-  @param validity: Validity for certificate in seconds
-  @return: a tuple of strings containing the PEM-encoded private key and
-           certificate
-
-  """
-  # Create private and public key
-  key = OpenSSL.crypto.PKey()
-  key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
-
-  # Create self-signed certificate
-  cert = OpenSSL.crypto.X509()
-  SetSubject(cert.get_subject())
-  cert.set_serial_number(1)
-  cert.gmtime_adj_notBefore(0)
-  cert.gmtime_adj_notAfter(24 * 60 * 60 * 365)
-  cert.set_issuer(cert.get_subject())
-  cert.set_pubkey(key)
-  cert.sign(signer_key, X509_CERT_SIGN_DIGEST)
-
-  key_pem = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
-  cert_pem = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
-
-  cfd = open(certfile, 'w')
-  cfd.write(cert_pem)
-  cfd.close()
-
-  kfd = open(keyfile, 'w')
-  kfd.write(key_pem)
-  kfd.close()
-
-  return (key_pem, cert_pem)
 
 def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
