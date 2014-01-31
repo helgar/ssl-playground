@@ -9,11 +9,11 @@ import random
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
 
-CA_CERT_FILE="ca_cert_py.pem"
-CA_KEY_FILE="ca_key_py.pem"
+CA_CERT_FILE="ca_cert.pem"
+CA_KEY_FILE="ca_key.pem"
 
-CA_CERT_CMD_FILE="ca_cert.pem"
-CA_KEY_CMD_FILE="ca_key.pem"
+#CA_CERT_CMD_FILE="ca_cert.pem"
+#CA_KEY_CMD_FILE="ca_key.pem"
 
 CLIENT_CERT_FILE="client_cert.pem"
 CLIENT_KEY_FILE="client_key.pem"
