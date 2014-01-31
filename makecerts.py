@@ -210,4 +210,4 @@ if __name__ == "__main__":
     print ("cacert: %s\n cakey: %s\n clientcert: %s\n clientkey: %s\n clientreq: %s" % (cacert, cakey, clientcert, clientkey, clientreq))
     #(cakeypem, cacertpem) = GenerateSelfSignedX509Cert("localhost", 356, cacert, cakey)
     GenerateCaCert(openssl_cnf, cacert, cakey)
-    GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
+    #GenerateKeyAndRequest(cacert, cakey, clientcert, clientkey, clientreq)
