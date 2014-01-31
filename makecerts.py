@@ -6,6 +6,8 @@ import sys
 import subprocess
 import random
 
+# TODO make proper makefile
+
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
 
@@ -91,6 +93,8 @@ def WritePemFile(pem_str, pem_file):
   pfd = open(pem_file, 'w')
   pfd.write(pem_str)
   pfd.close()
+
+# TODO: refactor this to make it smarter
 
 def WriteCertificate(cert, pem_file):
   pem_str = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
@@ -213,6 +217,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   VerifyKeyCert(key, cert)
 
 if __name__ == "__main__":
+  # TODO: parse options properly
   print "yay!"
   if len(sys.argv) < 6:
     print "Not enough arguments. Usage: ./makecerts.py cacert cakey clientcert clientkey clientreq openssl"
