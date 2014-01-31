@@ -203,6 +203,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   VerifyKeyCert(key, cert)
 
 if __name__ == "__main__":
+  print "yay!"
   if len(sys.argv) < 6:
     print "Not enough arguments. Usage: ./makecerts.py cacert cakey clientcert clientkey clientreq openssl"
   else:
