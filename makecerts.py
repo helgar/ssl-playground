@@ -2,7 +2,6 @@
 
 import OpenSSL
 import os
-import sys
 import subprocess
 import random
 import utils
@@ -74,46 +73,6 @@ def GenerateCaCert(openssl_cnf_file, ca_cert_file, ca_key_file):
   #cmd = "echo $OPENSSL_CONF"
   RunCmd(cmd, env=my_env)
 
-def WritePemFile(pem_str, pem_file):
-  pfd = open(pem_file, 'w')
-  pfd.write(pem_str)
-  pfd.close()
-
-# TODO: refactor this to make it smarter
-
-def WriteCertificate(cert, pem_file):
-  pem_str = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
-  WritePemFile(pem_str, pem_file)
-
-def WriteKey(key, pem_file):
-  pem_str = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
-  WritePemFile(pem_str, pem_file)
-
-def WriteRequest(req, pem_file):
-  pem_str = OpenSSL.crypto.dump_certificate_request(OpenSSL.crypto.FILETYPE_PEM, req)
-  WritePemFile(pem_str, pem_file)
-
-def ReadPemFile(pem_file):
-  pem_fd = open(pem_file, "r")
-  pem_str = pem_fd.read(-1)
-  pem_fd.close()
-  return pem_str
-
-def ReadCertificate(pem_file):
-  pem_str = ReadPemFile(pem_file)
-  cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, pem_str)
-  return cert
-
-def ReadKey(pem_file):
-  pem_str = ReadPemFile(pem_file)
-  key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, pem_str)
-  return key
-
-def ReadRequest(pem_file):
-  pem_str = ReadPemFile(pem_file)
-  key = OpenSSL.crypto.load_certificate_request(OpenSSL.crypto.FILETYPE_PEM, pem_str)
-  return key
-
 def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   """Generates a self-signed X509 certificate.
 
@@ -145,8 +104,8 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
 
   cert.sign(key, X509_CERT_SIGN_DIGEST)
 
-  WriteKey(key, keyfile)
-  WriteCertificate(cert, certfile)
+  utils.WriteKey(key, keyfile)
+  utils.WriteCertificate(cert, certfile)
 
   return (key, cert)
 
@@ -162,8 +121,8 @@ def VerifyKeyCert(key, cert):
     return True
 
 def VerifyKeyCertFile(key_file, cert_file):
-  key = ReadKey(key_file)
-  cert = ReadCertificate(cert_file)
+  key = utils.ReadKey(key_file)
+  cert = utils.ReadCertificate(cert_file)
   result = VerifyKeyCert(key, cert)
   if result:
     print("Certificate %s matches key %s." % (cert_file, key_file))
@@ -181,11 +140,11 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
   req.set_pubkey(key)
   req.sign(key, X509_CERT_SIGN_DIGEST)
 
-  WriteKey(key, keyfile)
-  WriteRequest(req, reqfile)
+  utils.WriteKey(key, keyfile)
+  utils.WriteRequest(req, reqfile)
 
-  ca_cert = ReadCertificate(cacertfile)
-  ca_key = ReadKey(cakeyfile)
+  ca_cert = utils.ReadCertificate(cacertfile)
+  ca_key = utils.ReadKey(cakeyfile)
 
   cert = OpenSSL.crypto.X509()
   cert.set_subject(req.get_subject())
@@ -201,7 +160,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
     ])
   cert.sign(ca_key, X509_CERT_SIGN_DIGEST)
 
-  WriteCertificate(cert, certfile)
+  utils.WriteCertificate(cert, certfile)
 
 if __name__ == "__main__":
 

@@ -1,6 +1,7 @@
 #/usr/bin/python
 
 import argparse
+import OpenSSL
 
 SIGN_CA = 'ca'
 SIGN_SELF = 'self'
@@ -114,6 +115,44 @@ def parse_options():
   print("client create: %s" % args.client_create)
 
   return args
+
+def WritePemFile(pem_str, pem_file):
+  pfd = open(pem_file, 'w')
+  pfd.write(pem_str)
+  pfd.close()
+
+def WriteCryptoEntity(cert, dump_fn, pem_file):
+  pem_str = dump_fn(OpenSSL.crypto.FILETYPE_PEM, cert)
+  WritePemFile(pem_str, pem_file)
+
+def WriteCertificate(cert, pem_file):
+  WriteCryptoEntity(cert, OpenSSL.crypto.dump_certificate, pem_file)
+
+def WriteKey(key, pem_file):
+  WriteCryptoEntity(key, OpenSSL.crypto.dump_privatekey, pem_file)
+
+def WriteRequest(req, pem_file):
+  WriteCryptoEntity(req, OpenSSL.crypto.dump_certificate_request, pem_file)
+
+def ReadPemFile(pem_file):
+  pem_fd = open(pem_file, "r")
+  pem_str = pem_fd.read(-1)
+  pem_fd.close()
+  return pem_str
+
+def ReadCryptoEntity(pem_file, load_fn):
+  pem_str = ReadPemFile(pem_file)
+  entity = load_fn(OpenSSL.crypto.FILETYPE_PEM, pem_str)
+  return entity
+
+def ReadCertificate(pem_file):
+  return ReadCryptoEntity(pem_file, OpenSSL.crypto.load_certificate)
+
+def ReadKey(pem_file):
+  return ReadCryptoEntity(pem_file, OpenSSL.crypto.load_privatekey)
+
+def ReadRequest(pem_file):
+  return ReadCryptoEntity(pem_file, OpenSSL.crypto.load_certificate_request)
 
 if __name__ == "__main__":
   pass

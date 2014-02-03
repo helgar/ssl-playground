@@ -3,33 +3,9 @@
 # A very simple client to connect to a http(s) server
 
 import pycurl
-import sys
-import OpenSSL
 import utils
 
 def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
-
-  # reading CA info
-  ca_fd = open(ca_info, "r")
-  ca = "".join(ca_fd.readlines())
-  ca_fd.close()
-  print ca
-
-  # reading client cert
-  cert_fd = open(client_cert, "r")
-  cert_content = cert_fd.read(-1)
-  cert_fd.close()
-
-  certificate = OpenSSL.crypto.load_certificate(
-    OpenSSL.crypto.FILETYPE_PEM, cert_content)
-
-  # reading client key
-  key_fd = open(client_key, "r")
-  key_content = key_fd.read(-1)
-  key_fd.close()
-
-  key = OpenSSL.crypto.load_privatekey(
-    OpenSSL.crypto.FILETYPE_PEM, key_content)
 
   curl.setopt(pycurl.FOLLOWLOCATION, False)
   curl.setopt(pycurl.CAINFO, ca_info)
