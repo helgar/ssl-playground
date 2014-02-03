@@ -3,11 +3,12 @@
 # Very simple HTTP server for test purposes
 
 import socket
-import sys
 from SocketServer import BaseServer
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 import OpenSSL
+
+import utils
 
 # create server.pem with
 # openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes
@@ -36,34 +37,14 @@ class SecureHTTPServer(HTTPServer):
         if not server_cert:
           raise Exception("No server cert!")
 
-        # load server certificate
-        cert_fd = open(server_cert, "r")
-        cert_content = cert_fd.read(-1)
-        cert_fd.close()
-
-        certificate = OpenSSL.crypto.load_certificate(
-          OpenSSL.crypto.FILETYPE_PEM, cert_content)
-
+        certificate = utils.ReadCertificate(server_cert)
         ctx.use_certificate(certificate)
 
-        # load server private key
-
-        key_fd = open(server_key, "r")
-        key_content = key_fd.read(-1)
-        key_fd.close()
-        key = OpenSSL.crypto.load_privatekey(
-          OpenSSL.crypto.FILETYPE_PEM, key_content)
-
+        key = utils.ReadKey(server_key)
         ctx.use_privatekey(key)
         ctx.check_privatekey()
 
-        # load ca cert
-        ca_fd = open(ca_cert, "r")
-        ca_cert_content = ca_fd.read(-1)
-        ca_fd.close()
-
-        ca_certificate = OpenSSL.crypto.load_certificate(
-          OpenSSL.crypto.FILETYPE_PEM, ca_cert_content)
+        ca_certificate = utils.ReadCertificate(ca_cert)
 
         try:
           # This will fail for PyOpenssl versions before 0.10
@@ -73,7 +54,7 @@ class SecureHTTPServer(HTTPServer):
           ctx.load_client_ca(ca_cert)
 
         print "Using server certificate: %s" % server_cert
-        print "Using server address: %s" % server_name
+        print "Using server address: %s" % str(server_address)
         print "Using ca certificate: %s" % ca_cert
         print "Using server private key: %s" % server_key
 
@@ -121,15 +102,10 @@ def test(HandlerClass=SecureHTTPRequestHandler,
 
 
 if __name__ == '__main__':
-  if len(sys.argv) < 5:
-    print "Not enough arguments. Usage: ./server.py /path/to/server.pem server_name /path/to/ca/cert /path/to/serverprivatekey.pem"
-  else:
-    server_cert = sys.argv[1]
-    server_name = sys.argv[2]
-    ca_cert = sys.argv[3]
-    server_key = sys.argv[4]
-    print "Using server certificate: %s" % server_cert
-    print "Using server address: %s" % server_name
-    print "Using ca certificate: %s" % ca_cert
-    print "Using server private key: %s" % server_key
-    test(server_cert=server_cert, server_name=server_name, ca_cert=ca_cert, server_key=server_key)
+
+  args = utils.parse_options()
+
+  test(server_cert=args.server_cert,
+       server_name=args.server_hostname,
+       ca_cert=args.ca_cert,
+       server_key=args.server_key)

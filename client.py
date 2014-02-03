@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
   res = Response()
   curl = pycurl.Curl()
-  curl.setopt(curl.URL, args.server_hostname)
+  curl.setopt(curl.URL, "https://%s" % args.server_hostname)
   curl.setopt(curl.WRITEFUNCTION, res.callback)
   
   _ConfigRpcCurl(curl, args.client_cert, args.ca_cert, args.client_key)
