@@ -5,6 +5,7 @@
 import pycurl
 import sys
 import OpenSSL
+import utils
 
 def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
 
@@ -56,32 +57,22 @@ class Response(object):
 
 
 if __name__ == "__main__":
-  print "I am a client!"
-  if len(sys.argv) < 5:
-    print "Not enough arguments. Usage: ./client.py client_cert server_address /path/to/cainfo client_key"
-  else:
-    client_cert = sys.argv[1]
-    server_address = sys.argv[2]
-    ca_info = sys.argv[3]
-    client_key = sys.argv[4]
-    print "Using client certificate: %s" % client_cert
-    print "Contacting server address: %s" % server_address
-    print "Using CA info: %s" % ca_info
-    print "Using client key: %s" % client_key
 
-    print("Using PycURL %s", pycurl.version)
+  args = utils.parse_options()
 
-    pycurl.global_init(pycurl.GLOBAL_ALL)
+  print("Using PycURL %s", pycurl.version)
 
-    res = Response()
-    curl = pycurl.Curl()
-    curl.setopt(curl.URL, server_address)
-    curl.setopt(curl.WRITEFUNCTION, res.callback)
-    
-    _ConfigRpcCurl(curl, client_cert, ca_info, client_key)
+  pycurl.global_init(pycurl.GLOBAL_ALL)
 
-    curl.perform()
-    print res.content()
+  res = Response()
+  curl = pycurl.Curl()
+  curl.setopt(curl.URL, args.server_hostname)
+  curl.setopt(curl.WRITEFUNCTION, res.callback)
+  
+  _ConfigRpcCurl(curl, args.client_cert, args.ca_cert, args.client_key)
 
-    pycurl.global_cleanup()
+  curl.perform()
+  print res.content()
+
+  pycurl.global_cleanup()
 

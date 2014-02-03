@@ -12,10 +12,12 @@ CA_KEY_FILE="ca_key.pem"
 CLIENT_CERT_FILE="client_cert.pem"
 CLIENT_KEY_FILE="client_key.pem"
 CLIENT_REQ_FILE="client_req.pem"
+CLIENT_HOSTNAME="localhost"
 
 SERVER_CERT_FILE="server_cert.pem"
 SERVER_KEY_FILE="server_key.pem"
 SERVER_REQ_FILE="server_req.pem"
+SERVER_HOSTNAME="localhost"
 
 OPENSSL_CNF_FILE="openssl.cnf"
 
@@ -51,6 +53,10 @@ def parse_options():
                       default=SERVER_REQ_FILE,
                       help='Filename of the server certificate signing '
                            'request.')
+  parser.add_argument('--server-hostname', dest='server_hostname',
+                      metavar='server_hostname', action='store',
+                      default=SERVER_HOSTNAME,
+                      help='Hostname of the server.')
   parser.add_argument('--server-sign-method', dest='server_sign_method',
                       action='store', default=SIGN_CA, choices=SIGN_METHODS,
                       help='Method for signing the server certificate.')
@@ -72,6 +78,10 @@ def parse_options():
                       metavar='client_req', action='store',
                       default=CLIENT_REQ_FILE,
                       help='Filename of client certificate signing request.')
+  parser.add_argument('--client-hostname', dest='client_hostname',
+                      metavar='client_hostname', action='store',
+                      default=CLIENT_HOSTNAME,
+                      help='Hostname of the client.')
   parser.add_argument('--client-sign-method', dest='client_sign_method',
                       action='store', default=SIGN_CA,
                       help='Method for signing the client certificate.')
@@ -92,12 +102,14 @@ def parse_options():
   print("server cert: %s" % args.server_cert)
   print("server key: %s" % args.server_key)
   print("server req: %s" % args.server_req)
+  print("server hostname: %s" % args.server_hostname)
   print("server signing method: %s" % args.server_sign_method)
   print("server create: %s" % args.server_create)
 
   print("client cert: %s" % args.client_cert)
   print("client key: %s" % args.client_key)
   print("client req: %s" % args.client_req)
+  print("client hostname: %s" % args.client_hostname)
   print("client signing method: %s" % args.client_sign_method)
   print("client create: %s" % args.client_create)
 
