@@ -11,7 +11,7 @@ RSA_KEY_BITS = 2048
 DEFAULT_VALIDITY_DAYS = 24 * 60 * 60 * 365 # one year
 
 
-def SetSubject(subject):
+def SetSubject(subject, common_name):
   """
   Our default CA issuer name.
   """
@@ -22,11 +22,11 @@ def SetSubject(subject):
   subject.O = 'Root Certification Authority'
 
 
-def SetServerSubject(subject):
+def SetServerSubject(subject, common_name):
   """
   Our default CA issuer name.
   """
-  subject.CN = "localhost"
+  subject.CN = common_name
   subject.ST = 'Viriginia'
   subject.C = "US"
   subject.emailAddress = 'ca@exampleca.org'
@@ -39,7 +39,7 @@ def GenerateSelfSignedCert(common_name, certfile, keyfile):
   key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
 
   cert = OpenSSL.crypto.X509()
-  SetSubject(cert.get_subject())
+  SetSubject(cert.get_subject(), common_name)
   cert.set_serial_number(int(random.randrange(0,10001,2)))
   cert.gmtime_adj_notBefore(0)
   cert.gmtime_adj_notAfter(DEFAULT_VALIDITY_DAYS)
@@ -81,13 +81,13 @@ def VerifyKeyCertFile(key_file, cert_file):
     print("Certificate %s does NOT match key %s." % (cert_file, key_file))
 
 
-def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
+def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile, common_name):
 
   key = OpenSSL.crypto.PKey()
   key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
   
   req = OpenSSL.crypto.X509Req()
-  SetServerSubject(req.get_subject())
+  SetServerSubject(req.get_subject(), common_name)
   req.set_pubkey(key)
   req.sign(key, X509_CERT_SIGN_DIGEST)
 
@@ -125,18 +125,20 @@ if __name__ == "__main__":
 
   certs = [
     (args.server_create, args.server_sign_method,
-     args.server_cert, args.server_key, args.server_req),
+     args.server_cert, args.server_key, args.server_req,
+     args.server_hostname),
     (args.client_create, args.client_sign_method,
-     args.client_cert, args.client_key, args.client_req),
+     args.client_cert, args.client_key, args.client_req,
+     args.client_hostname),
           ]
 
   if args.ca_create:
     (cakeypem, cacertpem) = GenerateSelfSignedCert(
-      "localhost", args.ca_cert, args.ca_key)
+      args.ca_hostname, args.ca_cert, args.ca_key)
     VerifyKeyCertFile(args.ca_key, args.ca_cert)
 
-  for (create, sign_method, cert, key, req) in certs:
+  for (create, sign_method, cert, key, req, hostname) in certs:
     if create: 
-      GenerateKeyAndRequest(args.ca_cert, args.ca_key, cert, key, req)
+      GenerateKeyAndRequest(args.ca_cert, args.ca_key, cert, key, req, hostname)
       SignRequest(req, args.ca_cert, args.ca_key, cert)
       VerifyKeyCertFile(key, cert)

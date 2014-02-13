@@ -9,6 +9,7 @@ SIGN_METHODS = {SIGN_CA, SIGN_SELF}
 
 CA_CERT_FILE="ca_cert.pem"
 CA_KEY_FILE="ca_key.pem"
+CA_HOSTNAME="localhost"
 
 CLIENT_CERT_FILE="client_cert.pem"
 CLIENT_KEY_FILE="client_key.pem"
@@ -40,6 +41,10 @@ def parse_options():
   parser.add_argument('--ca-create', dest='ca_create', action='store_true',
                       default=True,
                       help='Whether to create a new CA certificate/key pair.')
+  parser.add_argument('--ca-hostname', dest='ca_hostname',
+                      metavar='ca_hostname', action='store',
+                      default=CA_HOSTNAME,
+                      help='Hostname of the CA.')
 
   parser.add_argument('--server-cert', dest='server_cert',
                       metavar='server_cert', action='store',
@@ -57,7 +62,11 @@ def parse_options():
   parser.add_argument('--server-hostname', dest='server_hostname',
                       metavar='server_hostname', action='store',
                       default=SERVER_HOSTNAME,
-                      help='Hostname of the server.')
+                      help='Hostname of the server (of the certificate).')
+  parser.add_argument('--server-hostname-start', dest='server_hostname_start',
+                      metavar='server_hostname_start', action='store',
+                      default=SERVER_HOSTNAME,
+                      help='Hostname of the server (that it is actually started with).')
   parser.add_argument('--server-sign-method', dest='server_sign_method',
                       action='store', default=SIGN_CA, choices=SIGN_METHODS,
                       help='Method for signing the server certificate.')

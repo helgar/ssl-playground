@@ -10,9 +10,6 @@ import OpenSSL
 
 import utils
 
-# create server.pem with
-# openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes
-
 class SecureHTTPServer(HTTPServer):
 
     def _SSLVerifyCallback(self, conn, cert, errnum, errdepth, ok):
@@ -82,30 +79,14 @@ class SecureHTTPRequestHandler(SimpleHTTPRequestHandler):
         self.wfile = socket._fileobject(self.request, "wb", self.wbufsize)
 
 
-def test(HandlerClass=SecureHTTPRequestHandler,
-         ServerClass=SecureHTTPServer,
-         server_cert=None,
-         server_name=None,
-         ca_cert=None,
-         server_key=None):
-    if not server_name:
-      raise Exception("No server name given!")
-    if not ca_cert:
-      raise Exception("No CA cert was given!")
-    if not server_key:
-      raise Exception("No server key was given!")
-    server_address = (server_name, 443) # (address, port)
-    httpd = ServerClass(server_address, HandlerClass, server_cert, ca_cert, server_key)
-    sa = httpd.socket.getsockname()
-    print "Serving HTTPS on", sa[0], "port", sa[1], "..."
-    httpd.serve_forever()
-
-
 if __name__ == '__main__':
 
   args = utils.parse_options()
 
-  test(server_cert=args.server_cert,
-       server_name=args.server_hostname,
-       ca_cert=args.ca_cert,
-       server_key=args.server_key)
+  HandlerClass=SecureHTTPRequestHandler
+  ServerClass=SecureHTTPServer
+  server_address = (args.server_hostname_start, 443) # (address, port)
+  httpd = ServerClass(server_address, HandlerClass, args.server_cert, args.ca_cert, args.server_key)
+  sa = httpd.socket.getsockname()
+  print "Serving HTTPS on", sa[0], "port", sa[1], "..."
+  httpd.serve_forever()
