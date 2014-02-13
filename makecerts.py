@@ -1,8 +1,6 @@
 #/usr/bin/python
 
 import OpenSSL
-import os
-import subprocess
 import random
 import utils
 
@@ -11,6 +9,7 @@ import utils
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
 DEFAULT_VALIDITY_DAYS = 24 * 60 * 60 * 365 # one year
+
 
 def SetSubject(subject):
   """
@@ -34,22 +33,11 @@ def SetServerSubject(subject):
   subject.O = 'Root Certification Authority'
 
 
-def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
-  """Generates a self-signed X509 certificate.
+def GenerateSelfSignedCert(common_name, certfile, keyfile):
 
-  @type common_name: string
-  @param common_name: commonName value
-  @type validity: int
-  @param validity: Validity for certificate in seconds
-  @return: a tuple of strings containing the PEM-encoded private key and
-           certificate
-
-  """
-  # Create private and public key
   key = OpenSSL.crypto.PKey()
   key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
 
-  # Create self-signed certificate
   cert = OpenSSL.crypto.X509()
   SetSubject(cert.get_subject())
   cert.set_serial_number(int(random.randrange(0,10001,2)))
@@ -143,8 +131,8 @@ if __name__ == "__main__":
           ]
 
   if args.ca_create:
-    (cakeypem, cacertpem) = GenerateSelfSignedX509Cert(
-      "localhost", 356, args.ca_cert, args.ca_key)
+    (cakeypem, cacertpem) = GenerateSelfSignedCert(
+      "localhost", args.ca_cert, args.ca_key)
     VerifyKeyCertFile(args.ca_key, args.ca_cert)
 
   for (create, sign_method, cert, key, req) in certs:
