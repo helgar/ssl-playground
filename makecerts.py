@@ -4,14 +4,13 @@ import OpenSSL
 import random
 import utils
 
-# TODO make proper makefile
 
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
 DEFAULT_VALIDITY_DAYS = 24 * 60 * 60 * 365 # one year
 
 
-def SetSubject(subject, common_name):
+def SetCaSubject(subject, common_name):
   """
   Our default CA issuer name.
   """
@@ -22,7 +21,7 @@ def SetSubject(subject, common_name):
   subject.O = 'Root Certification Authority'
 
 
-def SetServerSubject(subject, common_name):
+def SetSubject(subject, common_name):
   """
   Our default CA issuer name.
   """
@@ -39,7 +38,7 @@ def GenerateSelfSignedCert(common_name, certfile, keyfile):
   key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
 
   cert = OpenSSL.crypto.X509()
-  SetSubject(cert.get_subject(), common_name)
+  SetCaSubject(cert.get_subject(), common_name)
   cert.set_serial_number(int(random.randrange(0,10001,2)))
   cert.gmtime_adj_notBefore(0)
   cert.gmtime_adj_notAfter(DEFAULT_VALIDITY_DAYS)
@@ -87,7 +86,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile, com
   key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
   
   req = OpenSSL.crypto.X509Req()
-  SetServerSubject(req.get_subject(), common_name)
+  SetSubject(req.get_subject(), common_name)
   req.set_pubkey(key)
   req.sign(key, X509_CERT_SIGN_DIGEST)
 
