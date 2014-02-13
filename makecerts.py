@@ -109,6 +109,7 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
 
   return (key, cert)
 
+
 def VerifyKeyCert(key, cert):
   ctx = OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_METHOD)
   ctx.use_privatekey(key)
@@ -120,6 +121,7 @@ def VerifyKeyCert(key, cert):
   else:
     return True
 
+
 def VerifyKeyCertFile(key_file, cert_file):
   key = utils.ReadKey(key_file)
   cert = utils.ReadCertificate(cert_file)
@@ -129,9 +131,9 @@ def VerifyKeyCertFile(key_file, cert_file):
   else:
     print("Certificate %s does NOT match key %s." % (cert_file, key_file))
 
+
 def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
-  # Create private and public key
   key = OpenSSL.crypto.PKey()
   key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
   
@@ -142,6 +144,11 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
   utils.WriteKey(key, keyfile)
   utils.WriteRequest(req, reqfile)
+
+
+def SignRequest(reqfile, cacertfile, cakeyfile, certfile):
+
+  req = utils.ReadRequest(reqfile)
 
   ca_cert = utils.ReadCertificate(cacertfile)
   ca_key = utils.ReadKey(cakeyfile)
@@ -162,6 +169,7 @@ def GenerateKeyAndRequest(cacertfile, cakeyfile, certfile, keyfile, reqfile):
 
   utils.WriteCertificate(cert, certfile)
 
+
 if __name__ == "__main__":
 
   args = utils.parse_options()
@@ -181,4 +189,5 @@ if __name__ == "__main__":
   for (create, sign_method, cert, key, req) in certs:
     if create: 
       GenerateKeyAndRequest(args.ca_cert, args.ca_key, cert, key, req)
+      SignRequest(req, args.ca_cert, args.ca_key, cert)
       VerifyKeyCertFile(key, cert)
