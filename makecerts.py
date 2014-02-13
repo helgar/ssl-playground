@@ -11,6 +11,7 @@ import utils
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
 
+
 def SetSubject(subject):
   """
   Our default CA issuer name.
@@ -20,6 +21,7 @@ def SetSubject(subject):
   subject.C = "US"
   subject.emailAddress = 'ca@exampleca.org'
   subject.O = 'Root Certification Authority'
+
 
 def SetServerSubject(subject):
   """
@@ -31,47 +33,6 @@ def SetServerSubject(subject):
   subject.emailAddress = 'ca@exampleca.org'
   subject.O = 'Root Certification Authority'
 
-def RunCmd(cmd, env=None):
-  if not isinstance(cmd, basestring):
-    cmd = [str(val) for val in cmd] 
-  #cmd = ["openssl version -a"]
-  print("Running command: %s" % ' '.join(cmd))
-  cmd_str = ' '.join(cmd)
-
-  p = subprocess.Popen(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  out, err = p.communicate()
-  print("RunCmd: OUT: %s\n ERR:%s\n" % (out, err)) 
-
-## create root cert:
-#OPENSSL_CONF=${CONFIG_FILE} openssl req -x509 -newkey rsa:2048 -out ${CA_CERT} -outform PEM -key ${PRIVATE_DIR}/${CA_KEY} -nodes
-#
-## check what it looks like:
-#OPENSSL_CONF=${CONFIG_FILE} openssl x509 -in ${CA_CERT} -text -noout
-#
-## create a certificate request:
-#unset OPENSSL_CONF && openssl req -newkey rsa:2048 -keyout ${SERVER_KEY} -keyform PEM -out ${SERVER_REQ} -nodes
-#unset OPENSSL_CONF && openssl req -newkey rsa:2048 -keyout ${CLIENT_KEY} -keyform PEM -out ${CLIENT_REQ} -nodes
-## check that it worked
-#openssl req -in ${SERVER_REQ} -text -noout
-#
-## signing the certificate request with the CA
-#OPENSSL_CONF=${CONFIG_FILE} openssl ca -in ${SERVER_REQ} -out ${SERVER_CERT} -md sha1
-#OPENSSL_CONF=${CONFIG_FILE} openssl ca -in ${CLIENT_REQ} -out ${CLIENT_CERT} -md sha1
-## consider using the -out and -notext option
-
-def GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file):
-  return ["OPENSSL_CONF=%s" % openssl_cnf_file,
-          'openssl', 'req', '-x509', '-newkey rsa:2048',
-          '-out %s' % ca_cert_file,
-          '-outform PEM',
-          '-nodes']  
-
-def GenerateCaCert(openssl_cnf_file, ca_cert_file, ca_key_file):
-  cmd = GetCaCertCmd(openssl_cnf_file, ca_cert_file, ca_key_file)
-  my_env = os.environ
-  my_env["OPENSSL_CONF"] = openssl_cnf_file
-  #cmd = "echo $OPENSSL_CONF"
-  RunCmd(cmd, env=my_env)
 
 def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   """Generates a self-signed X509 certificate.
