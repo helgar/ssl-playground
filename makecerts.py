@@ -10,7 +10,7 @@ import utils
 
 X509_CERT_SIGN_DIGEST = "SHA1"
 RSA_KEY_BITS = 2048
-
+DEFAULT_VALIDITY_DAYS = 24 * 60 * 60 * 365 # one year
 
 def SetSubject(subject):
   """
@@ -54,7 +54,7 @@ def GenerateSelfSignedX509Cert(common_name, validity, certfile, keyfile):
   SetSubject(cert.get_subject())
   cert.set_serial_number(int(random.randrange(0,10001,2)))
   cert.gmtime_adj_notBefore(0)
-  cert.gmtime_adj_notAfter(24 * 60 * 60 * 365)
+  cert.gmtime_adj_notAfter(DEFAULT_VALIDITY_DAYS)
   cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
   cert.set_version(0x02)
@@ -118,7 +118,7 @@ def SignRequest(reqfile, cacertfile, cakeyfile, certfile):
   cert.set_subject(req.get_subject())
   cert.set_serial_number(int(random.randrange(0,10001,2)))
   cert.gmtime_adj_notBefore(0)
-  cert.gmtime_adj_notAfter(24 * 60 * 60 * 365)
+  cert.gmtime_adj_notAfter(DEFAULT_VALIDITY_DAYS)
   cert.set_issuer(ca_cert.get_subject())
   cert.set_pubkey(req.get_pubkey())
   cert.set_version(0x02)
