@@ -5,6 +5,9 @@
 run_client:
 	python client.py
 
+run_client_gnu:
+	gnutls-cli -V --x509keyfile client_key.pem --x509certfile client_cert.pem --x509cafile ca_cert.pem localhost
+
 run_server:
 	python server.py
 
