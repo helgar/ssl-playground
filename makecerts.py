@@ -45,10 +45,10 @@ def GenerateSelfSignedCert(common_name, certfile, keyfile):
   cert.set_issuer(cert.get_subject())
   cert.set_pubkey(key)
   cert.set_version(0x02)
-  cert.add_extensions([
-    OpenSSL.crypto.X509Extension("basicConstraints", False,
-                                 "CA:TRUE"),
-    ])
+#  cert.add_extensions([
+#    OpenSSL.crypto.X509Extension("basicConstraints", False,
+#                                 "CA:TRUE"),
+#    ])
 
   cert.sign(key, X509_CERT_SIGN_DIGEST)
 
@@ -138,6 +138,11 @@ if __name__ == "__main__":
 
   for (create, sign_method, cert, key, req, hostname) in certs:
     if create: 
-      GenerateKeyAndRequest(args.ca_cert, args.ca_key, cert, key, req, hostname)
-      SignRequest(req, args.ca_cert, args.ca_key, cert)
-      VerifyKeyCertFile(key, cert)
+      if sign_method == utils.SIGN_CA:
+        GenerateKeyAndRequest(args.ca_cert, args.ca_key, cert, key, req,
+                              hostname)
+        SignRequest(req, args.ca_cert, args.ca_key, cert)
+        VerifyKeyCertFile(key, cert)
+      if sign_method == utils.SIGN_SELF:
+        GenerateSelfSignedCert(hostname, cert, key)
+

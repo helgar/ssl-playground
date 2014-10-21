@@ -45,6 +45,10 @@ if __name__ == "__main__":
   curl.setopt(curl.URL, "https://%s" % args.server_hostname)
   curl.setopt(curl.WRITEFUNCTION, res.callback)
   
+  print ("Using client cert: %s" % args.client_cert)
+  print ("Using ca cert: %s" % args.ca_cert)
+  print ("Using client key: %s" % args.client_key)
+
   _ConfigRpcCurl(curl, args.client_cert, args.ca_cert, args.client_key)
 
   curl.perform()

@@ -15,6 +15,10 @@ run_server:
 certsp:
 	python makecerts.py
 
+# make self-signed certs with python script
+certspss:
+	python makecerts.py --server-sign-method=self
+
 # make certs with open ssl commandline tools
 certso:
 	./makecerts_openssl.sh
