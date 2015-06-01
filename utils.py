@@ -107,6 +107,9 @@ def parse_options():
                       default=True,
                       help='Whether to create a new client certificate/key '
                            'pair.')
+  parser.add_argument('--load-client-as-ca', dest='load_client_ca',
+                      action='store_true', default=False,
+                      help='Whether or not to load the client certs as CA list.')
 
   args = parser.parse_args()
 
