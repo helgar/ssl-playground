@@ -20,6 +20,7 @@ SERVER_CERT_FILE="server_cert.pem"
 SERVER_KEY_FILE="server_key.pem"
 SERVER_REQ_FILE="server_req.pem"
 SERVER_HOSTNAME="localhost"
+SERVER_PORT=9191
 
 OPENSSL_CNF_FILE="openssl.cnf"
 
@@ -66,7 +67,13 @@ def parse_options():
   parser.add_argument('--server-hostname-start', dest='server_hostname_start',
                       metavar='server_hostname_start', action='store',
                       default=SERVER_HOSTNAME,
-                      help='Hostname of the server (that it is actually started with).')
+                      help='Hostname of the server (that it is actually started'
+                      ' with).')
+  parser.add_argument('--server-port', dest='server_port',
+                      metavar='server_port', action='store',
+                      default=SERVER_PORT,
+                      help='Port of the server (that it is actually started'
+                      ' with).')
   parser.add_argument('--server-sign-method', dest='server_sign_method',
                       action='store', default=SIGN_CA, choices=SIGN_METHODS,
                       help='Method for signing the server certificate.')

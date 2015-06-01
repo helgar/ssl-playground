@@ -1,4 +1,4 @@
-#/usr/bin/python
+#!/usr/bin/python
 
 # Very simple HTTP server for test purposes
 
@@ -42,13 +42,18 @@ class SecureHTTPServer(HTTPServer):
         ctx.check_privatekey()
 
         ca_certificate = utils.ReadCertificate(ca_cert)
+        other_client_cert = utils.ReadCertificate("client_cert.pem")
 
-        try:
-          # This will fail for PyOpenssl versions before 0.10
-          ctx.add_client_ca(ca_certificate)
-        except AttributeError:
-          # Fall back to letting OpenSSL read the certificate file directly.
-          ctx.load_client_ca(ca_cert)
+        ca_subject = ca_certificate.get_subject()
+        other_client_subject = other_client_cert.get_subject()
+        ctx.set_client_ca_list([ca_subject, other_client_subject])
+
+        #try:
+        #  # This will fail for PyOpenssl versions before 0.10
+        #  ctx.add_client_ca(ca_certificate)
+        #except AttributeError:
+        #  # Fall back to letting OpenSSL read the certificate file directly.
+        #  ctx.load_client_ca(ca_cert)
 
         print "Using server certificate: %s" % server_cert
         print "Using server address: %s" % str(server_address)
@@ -85,7 +90,7 @@ if __name__ == '__main__':
 
   HandlerClass=SecureHTTPRequestHandler
   ServerClass=SecureHTTPServer
-  server_address = (args.server_hostname_start, 443) # (address, port)
+  server_address = (args.server_hostname_start, args.server_port) # (address, port)
   httpd = ServerClass(server_address, HandlerClass, args.server_cert, args.ca_cert, args.server_key)
   sa = httpd.socket.getsockname()
   print "Serving HTTPS on", sa[0], "port", sa[1], "..."

@@ -25,3 +25,10 @@ certso:
 
 clean:
 	rm -rf *.pem serial* index*
+
+show-server-cert:
+	openssl x509 -in server_cert.pem -text
+
+show-client-cert:
+	openssl x509 -in client_cert.pem -text
+

@@ -1,4 +1,4 @@
-#/usr/bin/python
+#!/usr/bin/python
 
 # A very simple client to connect to a http(s) server
 
@@ -42,7 +42,8 @@ if __name__ == "__main__":
 
   res = Response()
   curl = pycurl.Curl()
-  curl.setopt(curl.URL, "https://%s" % args.server_hostname)
+  curl.setopt(curl.URL, "https://%s:%s" %
+              (args.server_hostname, args.server_port))
   curl.setopt(curl.WRITEFUNCTION, res.callback)
   
   print ("Using client cert: %s" % args.client_cert)
