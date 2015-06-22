@@ -17,7 +17,7 @@ def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
   curl.setopt(pycurl.SSLKEY, client_key)
   curl.setopt(pycurl.CONNECTTIMEOUT, 360)
   curl.setopt(pycurl.VERBOSE, 1)
-  curl.setopt(pycurl.SSLVERSION, pycurl.SSLVERSION_SSLv3)
+  #curl.setopt(pycurl.SSLVERSION, pycurl.SSLVERSION_SSLv3)
 
 
 class Response(object):
@@ -50,6 +50,13 @@ if __name__ == "__main__":
   print ("Using client key: %s" % args.client_key)
 
   _ConfigRpcCurl(curl, args.client_cert, args.ca_cert, args.client_key)
+
+  print "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+  print curl
+  print dir(curl)
+  print dir(pycurl)
+  #print curl.getinfo(pycurl.INFO_CERTINFO)
+  print "XXXXXXXXXXXXXXXXXXXXXXXXXX"
 
   curl.perform()
   print res.content()
