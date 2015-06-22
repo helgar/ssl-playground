@@ -141,6 +141,7 @@ if __name__ == "__main__":
     if create: 
       if sign_method == utils.SIGN_CA:
         print "Chose CA SIGNED"
+        print "signing by %s %s" % (args.ca_cert, args.ca_key)
         GenerateKeyAndRequest(args.ca_cert, args.ca_key, cert, key, req,
                               hostname)
         SignRequest(req, args.ca_cert, args.ca_key, cert)
