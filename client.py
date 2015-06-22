@@ -1,4 +1,4 @@
-#/usr/bin/python
+#!/usr/bin/python
 
 # A very simple client to connect to a http(s) server
 
@@ -6,6 +6,14 @@ import pycurl
 import utils
 
 def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
+
+  curl.setopt(pycurl.VERBOSE, False)
+  curl.setopt(pycurl.NOSIGNAL, True)
+  curl.setopt(pycurl.USERAGENT, "Ganeti 12.15")
+  curl.setopt(pycurl.PROXY, "")
+  curl.setopt(pycurl.CUSTOMREQUEST, "bla")
+  curl.setopt(pycurl.POSTFIELDS, "bla")
+  curl.setopt(pycurl.HTTPHEADER, "bla")
 
   curl.setopt(pycurl.FOLLOWLOCATION, False)
   curl.setopt(pycurl.CAINFO, ca_info)
@@ -16,8 +24,9 @@ def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
   curl.setopt(pycurl.SSLKEYTYPE, "PEM")
   curl.setopt(pycurl.SSLKEY, client_key)
   curl.setopt(pycurl.CONNECTTIMEOUT, 360)
-  curl.setopt(pycurl.VERBOSE, 1)
-  #curl.setopt(pycurl.SSLVERSION, pycurl.SSLVERSION_SSLv3)
+  curl.setopt(pycurl.SSLVERSION, pycurl.SSLVERSION_SSLv3)
+
+  curl.setopt(pycurl.TIMEOUT, 100)
 
 
 class Response(object):
@@ -42,7 +51,8 @@ if __name__ == "__main__":
 
   res = Response()
   curl = pycurl.Curl()
-  curl.setopt(curl.URL, "https://%s" % args.server_hostname)
+  curl.setopt(curl.URL, "https://%s:%s" %
+              (args.server_hostname, args.server_port))
   curl.setopt(curl.WRITEFUNCTION, res.callback)
   
   print ("Using client cert: %s" % args.client_cert)

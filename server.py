@@ -1,4 +1,4 @@
-#/usr/bin/python
+#!/usr/bin/python
 
 # Very simple HTTP server for test purposes
 
@@ -21,7 +21,8 @@ class SecureHTTPServer(HTTPServer):
         print "ok: %s" % ok
         return True
 
-    def __init__(self, server_address, HandlerClass, server_cert, ca_cert, server_key):
+    def __init__(self, server_address, HandlerClass, server_cert, ca_cert,
+                 server_key, load_client_as_ca=False, client_cert=None):
         print("self.address_family: %s" % self.address_family)
         self.address_family = socket.AF_INET
         print("self.socket_type: %s" % self.socket_type)
@@ -43,12 +44,20 @@ class SecureHTTPServer(HTTPServer):
 
         ca_certificate = utils.ReadCertificate(ca_cert)
 
-        try:
-          # This will fail for PyOpenssl versions before 0.10
-          ctx.add_client_ca(ca_certificate)
-        except AttributeError:
-          # Fall back to letting OpenSSL read the certificate file directly.
-          ctx.load_client_ca(ca_cert)
+        if load_client_as_ca:
+          ca_subject = ca_certificate.get_subject()
+          print "Loading client cert: %s" % client_cert
+          client_cert = utils.ReadCertificate(client_cert)
+          client_subject = client_cert.get_subject()
+          ca_list = [ca_subject, client_subject]
+          ctx.set_client_ca_list(ca_list)
+        else:
+          try:
+            # This will fail for PyOpenssl versions before 0.10
+            ctx.add_client_ca(ca_certificate)
+          except AttributeError:
+            # Fall back to letting OpenSSL read the certificate file directly.
+            ctx.load_client_ca(ca_cert)
 
         print "Using server certificate: %s" % server_cert
         print "Using server address: %s" % str(server_address)
@@ -85,8 +94,10 @@ if __name__ == '__main__':
 
   HandlerClass=SecureHTTPRequestHandler
   ServerClass=SecureHTTPServer
-  server_address = (args.server_hostname_start, 443) # (address, port)
-  httpd = ServerClass(server_address, HandlerClass, args.server_cert, args.ca_cert, args.server_key)
+  server_address = (args.server_hostname_start, args.server_port) # (address, port)
+  httpd = ServerClass(server_address, HandlerClass, args.server_cert,
+                      args.ca_cert, args.server_key, args.load_client_ca,
+                      args.client_cert)
   sa = httpd.socket.getsockname()
   print "Serving HTTPS on", sa[0], "port", sa[1], "..."
   httpd.serve_forever()

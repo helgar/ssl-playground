@@ -1,4 +1,4 @@
-#/usr/bin/python
+#!/usr/bin/python
 
 import OpenSSL
 import random
@@ -14,7 +14,7 @@ def SetCaSubject(subject, common_name):
   """
   Our default CA issuer name.
   """
-  subject.CN = "Example CA"
+  subject.CN = common_name
   subject.ST = 'Viriginia'
   subject.C = "US"
   subject.emailAddress = 'ca@exampleca.org'
@@ -33,6 +33,7 @@ def SetSubject(subject, common_name):
 
 
 def GenerateSelfSignedCert(common_name, certfile, keyfile):
+  print "common name: %s" % common_name
 
   key = OpenSSL.crypto.PKey()
   key.generate_key(OpenSSL.crypto.TYPE_RSA, RSA_KEY_BITS)
@@ -139,10 +140,13 @@ if __name__ == "__main__":
   for (create, sign_method, cert, key, req, hostname) in certs:
     if create: 
       if sign_method == utils.SIGN_CA:
+        print "Chose CA SIGNED"
+        print "signing by %s %s" % (args.ca_cert, args.ca_key)
         GenerateKeyAndRequest(args.ca_cert, args.ca_key, cert, key, req,
                               hostname)
         SignRequest(req, args.ca_cert, args.ca_key, cert)
         VerifyKeyCertFile(key, cert)
       if sign_method == utils.SIGN_SELF:
+        print "Chose SELF SIGNED"
         GenerateSelfSignedCert(hostname, cert, key)
 
