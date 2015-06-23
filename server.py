@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
   HandlerClass=SecureHTTPRequestHandler
   ServerClass=SecureHTTPServer
-  server_address = (args.server_hostname_start, args.server_port) # (address, port)
+  server_address = (args.server_hostname_start, int(args.server_port)) # (address, port)
   httpd = ServerClass(server_address, HandlerClass, args.server_cert,
                       args.ca_cert, args.server_key, args.load_client_ca,
                       args.client_cert)
