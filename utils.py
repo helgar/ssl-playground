@@ -5,7 +5,7 @@ import OpenSSL
 
 SIGN_CA = 'ca'
 SIGN_SELF = 'self'
-SIGN_METHODS = {SIGN_CA, SIGN_SELF}
+SIGN_METHODS = [SIGN_CA, SIGN_SELF]
 
 CA_CERT_FILE="ca_cert.pem"
 CA_KEY_FILE="ca_key.pem"

@@ -61,6 +61,13 @@ if __name__ == "__main__":
 
   _ConfigRpcCurl(curl, args.client_cert, args.ca_cert, args.client_key)
 
+  print "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+  print curl
+  print dir(curl)
+  print dir(pycurl)
+  #print curl.getinfo(pycurl.INFO_CERTINFO)
+  print "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+
   curl.perform()
   print res.content()
 
