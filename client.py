@@ -11,9 +11,9 @@ def _ConfigRpcCurl(curl, client_cert, ca_info, client_key):
   curl.setopt(pycurl.NOSIGNAL, True)
   curl.setopt(pycurl.USERAGENT, "Ganeti 12.15")
   curl.setopt(pycurl.PROXY, "")
-  curl.setopt(pycurl.CUSTOMREQUEST, "POST")
-  curl.setopt(pycurl.POSTFIELDS, "[]")
-  curl.setopt(pycurl.HTTPHEADER, ['Content-type: application/json', 'Expect:'])
+#  curl.setopt(pycurl.CUSTOMREQUEST, "POST")
+#  curl.setopt(pycurl.POSTFIELDS, "[]")
+#  curl.setopt(pycurl.HTTPHEADER, ['Content-type: application/json', 'Expect:'])
 
   curl.setopt(pycurl.FOLLOWLOCATION, False)
   curl.setopt(pycurl.CAINFO, ca_info)
