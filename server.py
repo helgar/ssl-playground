@@ -13,16 +13,19 @@ import utils
 class SecureHTTPServer(HTTPServer):
 
     def _SSLVerifyCallback(self, conn, cert, errnum, errdepth, ok):
+        print "VERIFY PEER"
         print "conn: %s" % conn
         print "cert: %s" % cert
         print "cert.subject: %s" % cert.get_subject()
         print "errnum: %s" % errnum
         print "errdepth: %s" % errdepth
         print "ok: %s" % ok
+        print "END VERIFY PEER"
         return True
 
     def __init__(self, server_address, HandlerClass, server_cert, ca_cert,
-                 server_key, load_client_as_ca=False, client_cert=None):
+                 server_key, load_client_as_ca=False, client_cert=None,
+                 ssl_verify_peer=True):
         print("self.address_family: %s" % self.address_family)
         self.address_family = socket.AF_INET
         print("self.socket_type: %s" % self.socket_type)
