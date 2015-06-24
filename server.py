@@ -32,7 +32,9 @@ class SecureHTTPServer(HTTPServer):
         self.socket_type = socket.SOCK_STREAM 
         BaseServer.__init__(self, server_address, HandlerClass)
 
-        ctx = OpenSSL.SSL.Context(OpenSSL.SSL.SSLv23_METHOD)
+        
+        #ctx = OpenSSL.SSL.Context(OpenSSL.SSL.SSLv23_METHOD)
+        ctx = OpenSSL.SSL.Context(OpenSSL.SSL.TLSv1_METHOD)
         ctx.set_options(OpenSSL.SSL.OP_NO_SSLv2)
 
         if not server_cert:
