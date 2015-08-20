@@ -9,7 +9,7 @@ run_client_gnu:
 	gnutls-cli -V --x509keyfile client_key.pem --x509certfile client_cert.pem --x509cafile ca_cert.pem localhost
 
 run_client_openssl:
-        openssl s_client -key client_key.pem -cert client_cert.pem -CAfile server_cert.pem -host magritte.muc.corp.google.com -port 9191 -tls1
+	openssl s_client -key client_key.pem -cert client_cert.pem -CAfile server_cert.pem -host magritte.muc.corp.google.com -port 9191 -tls1
 
 run_server:
 	python server.py
